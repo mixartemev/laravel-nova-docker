@@ -1,0 +1,55 @@
+version: '3.7'
+
+services:
+
+  composer: # Install and init app
+    image: composer
+    volumes:
+    - &path_map ./app:/var/www
+    # Comment next line if your repo is public
+    - ${GIT_SSH_KEY}:/root/.ssh/id_rsa:ro
+    working_dir: /var
+    command: >
+      bash -c "echo -e 'Host *\nStrictHostKeyChecking no\n' > ~/.ssh/config
+      && git clone $MY_APP_GIT www && cd www
+      && composer config http-basic.nova.laravel.com ${NOVA_USER} ${NOVA_PASSWORD}
+      && composer --no-interaction global require 'hirak/prestissimo'
+      && composer install --ignore-platform-reqs
+      && ./artisan nova:publish"
+
+  db: # mysql server stores db at host dir
+    image: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: &db_pwd ${MYSQL_PWD}
+      MYSQL_DATABASE: &db_name $DB_DATABASE
+    volumes:
+    - ./dbs:/var/lib/mysql
+
+  adminer: # web interface to db
+    image: adminer
+    restart: always
+    ports:
+    - 6080:8080
+
+  web: # web server + php which exec your app
+    build: ./web
+    environment:
+      APACHE_RUN_USER: www-data
+      APP_NAME: *db_name
+      DB_HOST: db
+      DB_DATABASE: *db_name
+      DB_USERNAME: root
+      DB_PASSWORD: *db_pwd
+      MYSQL_ROOT_PASSWORD: *db_pwd
+    volumes:
+    - *path_map
+    # Forwarding into app shell script for waiting when laravel and db installs
+    - ./wait-install.sh:${APP_PATH_CONTAINER}/wait-install.sh
+    depends_on: # it's not wait until
+    - composer
+    - db
+    ports:
+    - 8080:80
+    working_dir: ${APP_PATH_CONTAINER}
+    command: bash -c "./wait-install.sh ${AFTER_INIT_SCRIPT} && apache2-foreground"

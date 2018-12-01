@@ -35,7 +35,7 @@ services:
   web: # web server + php which exec your app
     build: ./web
     environment:
-      APACHE_RUN_USER: www-data
+      APACHE_RUN_USER: www-data #1000
       APP_NAME: *db_name
       DB_HOST: db
       DB_DATABASE: *db_name
@@ -50,6 +50,6 @@ services:
     - composer
     - db
     ports:
-    - 8080:80
+    - $HTTP_PORT:80
     working_dir: ${APP_PATH_CONTAINER}
     command: bash -c "./wait-install.sh ${AFTER_INIT_SCRIPT} && apache2-foreground"

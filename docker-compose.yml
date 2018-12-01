@@ -22,7 +22,7 @@ services:
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: &db_pwd ${MYSQL_PWD}
-      MYSQL_DATABASE: &db_name $DB_DATABASE
+      MYSQL_DATABASE: &app_name $APP_NAME
     volumes:
     - ./dbs:/var/lib/mysql
 
@@ -36,9 +36,9 @@ services:
     build: ./web
     environment:
       APACHE_RUN_USER: www-data #1000
-      APP_NAME: *db_name
+      APP_NAME: *app_name
       DB_HOST: db
-      DB_DATABASE: *db_name
+      DB_DATABASE: *app_name
       DB_USERNAME: root
       DB_PASSWORD: *db_pwd
       MYSQL_ROOT_PASSWORD: *db_pwd

@@ -5,7 +5,7 @@ services:
   composer: # Install and init app
     image: composer
     volumes:
-    - &path_map ./app:/var/www
+    - &path_map ./src:/var/www
     # Comment next line if your repo is public
     - ${GIT_SSH_KEY}:/root/.ssh/id_rsa:ro
     working_dir: /var
@@ -23,8 +23,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: &db_pwd ${MYSQL_PWD}
       MYSQL_DATABASE: &app_name $APP_NAME
-    volumes:
-    - ./dbs:/var/lib/mysql
+#    volumes:
+#    - ./dbs:/var/lib/mysql
 
   adminer: # web interface to db
     image: adminer

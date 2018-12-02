@@ -16,14 +16,20 @@ Simplest working way easiest for learning. Use at hosting servers ready.
 in your project composer.json
 
 ### Install
-1. `cp .env.dist .env`
+1. Clone rep
+```bash
+git clone git@github.com:mixartemev/laravel-nova-docker.git
+cd laravel-nova-docker
+```
 
-2. Set your `.env`
+2. `cp .env.dist .env`
+
+3. Set your `.env`
     1. set your git repository link
     2. set your nova credentials (if you use nova)
     3. and others options optionally
 
-3. `docker-compose up`
+4. `docker-compose up`
 
 ### Usage
 
